@@ -3,9 +3,12 @@ import base.data.TrainingData
 import base.data.TrainingItem
 import base.neurons.Brain
 import base.neurons.Layer
+import base.neurons.SimpleLayer
 import base.vectors.Matrix
 import base.vectors.RealVector
-import base.vectors.VectorImpl
+import base.vectors.Vector
+import base.vectors.VectorByteImpl
+import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
 val random = Random(23411)
@@ -13,10 +16,10 @@ val random = Random(23411)
 fun generateData(
     nbe: Int,
     intputSize: Int,
-    fct: (RealVector) -> Int
-): TrainingData {
+    fct: (Vector<Double>) -> Int
+): TrainingData<Double> {
 
-    val items: List<TrainingItem> = (1..nbe).map {
+    val items: List<TrainingItem<Double>> = (1..nbe).map {
         val input = RealVector(intputSize) {
             random.nextDouble(0.0, 10.0)
         }
@@ -25,10 +28,10 @@ fun generateData(
     return TrainingData(items)
 }
 
-fun addData4(t1 : TrainingData,
-             fct: (RealVector) -> Int) : TrainingData {
+fun addData4(t1 : TrainingData<Double>,
+             fct: (Vector<Double>) -> Int) : TrainingData<Double> {
     var x : Double = 0.0
-    val items: List<TrainingItem> = (1..1000).map {
+    val items: List<TrainingItem<Double>> = (1..1000).map {
         x = 0.0
         val input = RealVector(4) {
             if (it < 3) {
@@ -51,23 +54,23 @@ fun addData4(t1 : TrainingData,
     return TrainingData(items + t1.items)
 }
 
-fun data1(): TrainingData {
+fun data1(): TrainingData<Double> {
     return generateData(1000, 4) { 0 }
 }
 
-fun dataVerif1(): TrainingData {
+fun dataVerif1(): TrainingData<Double> {
     return generateData(10, 4) { 0 }
 }
 
-fun data2(): TrainingData {
+fun data2(): TrainingData<Double> {
     return generateData(1000, 4) { it[0].toInt() / 5 }
 }
 
-fun dataVerif2(): TrainingData {
+fun dataVerif2(): TrainingData<Double> {
     return generateData(30, 4) { it[0].toInt() / 5 }
 }
 
-fun data3(): TrainingData {
+fun data3(): TrainingData<Double> {
     return generateData(1000, 4) {
         val value: Int
         if (it[0] < 0.5 && it[1] > 0.5) {
@@ -81,7 +84,7 @@ fun data3(): TrainingData {
     }
 }
 
-fun dataVerif3(): TrainingData {
+fun dataVerif3(): TrainingData<Double> {
     return generateData(30, 4) {
         val value: Int
         if (it[0] < 0.5 && it[1] > 0.5) {
@@ -95,7 +98,7 @@ fun dataVerif3(): TrainingData {
     }
 }
 
-fun data4(nbe: Int): TrainingData {
+fun data4(nbe: Int): TrainingData<Double> {
     return generateData(nbe, 4) {
         if (it.times(it) < 200.0) {
             0
@@ -115,46 +118,41 @@ fun main(args: Array<String>) {
     val m1 = Matrix(5, 4) {
         (-23 + it).toByte()
     }
-    val v1 = VectorImpl(5) { it.toByte() }
 
     val m2 = Matrix(7, 5) {
         (-23 + it).toByte()
     }
-    val v2 = VectorImpl(7) { it.toByte() }
 
     val m3 = Matrix(3, 7) {
         (-23 + it).toByte()
     }
-    val v3 = VectorImpl(3) { it.toByte() }
 
     val m4 = Matrix(2, 3) {
         (-23 + it).toByte()
     }
-    val v4 = VectorImpl(2) { it.toByte() }
-
 
     val brain = Brain(
         layers = listOf<Layer>(
-            Layer(m1, v1),
-            Layer(m2, v2),
-            Layer(m3, v3),
-            Layer(m4, v4)
+            SimpleLayer(m1),
+            SimpleLayer(m2),
+            SimpleLayer(m3),
+            SimpleLayer(m4)
         )
     )
-    val datas: TrainingData = addData4(data4(3000))
+    val datas: TrainingData<Double> = addData4(data4(3000))
      {
-        if (it.times(it) < 200.0) {
+        if (it * it < 200.0) {
             0
         } else {
             1
         }
     }
-    val trainer = Trainer(brain, datas)
+    val trainer = Trainer(brain, { datas })
 
     val bestBrain = trainer.train()
-    val verif: TrainingData = data4(30)
-    val score = verif.tryScore(bestBrain)
-    println("Score : ${score}")
+    val verif: TrainingData<Double> = data4(30)
+    val score : Pair<Double, Double> = runBlocking { verif.scoreAndRate(bestBrain::digestDouble) }
+    println("Score : ${score.first}")
 
-    println(bestBrain)
+   // println(bestBrain)
 }
