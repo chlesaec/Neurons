@@ -1,74 +1,18 @@
 package base.neurons
 
-import base.vectors.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import base.vectors.Matrix
+import base.vectors.RealVector
+import base.vectors.Vector
+import base.vectors.VectorByteImpl
 import org.junit.jupiter.api.Assertions
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.cos
 import kotlin.test.Test
 
 internal class LayerTest {
 
     @Test
-    fun channels() {
-        runBlocking {
-            val channel = Channel<Double>()
-            launch {
-                for (x in 1..5) {
-                    println("\tinside ${x}")
-                    channel.send(longMethod())
-                }
-                channel.close() // we're done sending
-            }
-// here we print received values using `for` loop (until the channel is closed)
-            println("After launch")
-            for (y in channel) println(y)
-            println("Done!")
-        }
-    }
-
-    @Test
-    fun teco() {
-        runBlocking(Dispatchers.Unconfined) {
-
-            val job1 = launch {
-                println("Start 1")
-                longMethod()
-                println("End 1")
-            }
-            val job2 = launch {
-                println("Start 2")
-                longMethod()
-                println("End 2")
-            }
-            job1.join()
-            job2.join()
-        }
-    }
-
-    fun longMethod(): Double {
-        /*suspendCancellableCoroutine<Unit> {
-            cont: CancellableContinuation<Unit> ->
-            cont.context.delay.
-        }*/
-      //  delay(22)
-        var result = 0.0
-        for (i in 1..10000) {
-           // launch(CoroutineContext.) {
-                result += cos(i * 3.0)
-           // }
-        }
-        return result
-    }
-
-    @Test
     fun test() {
         val layer = SimpleLayer(
-            inputAxons = Matrix(3, 3) { 0 },
-            thresholds = VectorByteImpl(3) {
-                if (it == 0) 0 else 100
-            }
+            inputAxons = Matrix(3, 3) { 0 }
         )
 
         val inputData = RealVector(3) {
@@ -96,16 +40,12 @@ internal class LayerTest {
                 1
             }
         }
-        val thresholds = VectorByteImpl(1) {
-            it.toByte()
-        }
-        val layer = ConvolutionalLayer(axons, thresholds, Dimension(20, 20))
+
+        val layer = ConvolutionalLayer(axons, Dimension(20, 20))
         val inputVector = VectorByteImpl(400) {
             (it / 3).toByte()
-
         }
         val result = layer.times(inputVector)
-        Assertions.assertEquals(17*17, result.size)
-
+        Assertions.assertEquals(81, result.size)
     }
 }

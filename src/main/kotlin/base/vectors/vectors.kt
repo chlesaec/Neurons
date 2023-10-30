@@ -1,8 +1,9 @@
 package base.vectors
 
-import java.lang.StringBuilder
-import java.util.Arrays
+import java.util.*
+import kotlin.math.abs
 import kotlin.math.min
+import kotlin.math.sign
 import kotlin.math.sqrt
 
 interface Vector<T> : Iterable<T> where T:Number, T:Comparable<T> {
@@ -66,7 +67,7 @@ interface VectorByte: Vector<Byte> {
             result += this.get(it) * v.get(it)
         }
         result /= v.size
-        result = sqrt(result.toDouble()).toInt()
+        result = (sign(result.toDouble())*sqrt(abs(result.toDouble()))).toInt()
 
         return if (result >= Byte.MAX_VALUE) {
             Byte.MAX_VALUE
@@ -209,37 +210,16 @@ data class Matrix(val line : Int, val col : Int, val values: ByteArray) {
     operator fun times(v : Vector<Byte>) : Vector<Byte> {
         val result : Vector<Byte> = if (v.size == this.line) {
             val array = ByteArray(this.col)
-           // println("Matrix time vector, case 1; size: ${array.size}; line size : ${this.line}")
-          //  runBlocking {
-               // val jobs = Array<Job?>(array.size) { null }
                 repeat(array.size) {
-                   // val job = GlobalScope.launch {
-                        array[it] = v * colVector(it)
-                   // }
-                   // jobs[it] = job
-               //     println("Matrix time vector, case 1; job[${it}] ok")
+                     array[it] = v * colVector(it)
                 }
-              /*  jobs.filterNotNull().forEach {
-                    it.join()
-                    println("Matrix time vector; join ok")
-                }*/
-          //  }
             VectorByteImpl(array)
         }
         else if (v.size == this.col) {
             val array = ByteArray(this.line)
-          //  println("Matrix time vector, case 2; size: ${array.size}")
-          //  runBlocking {
-           //     val jobs = Array<Job?>(array.size) { null }
                 repeat(array.size) {
-              //      val job = GlobalScope.launch {
-                        array[it] = v *lineVector(it)
-             //       }
-                //    jobs[it] = job
-             //       println("Matrix time vector, case 2; job[${it}] ok")
+                    array[it] = v *lineVector(it)
                 }
-            //    jobs.filterNotNull().forEach { it.join() }
-            //}
             VectorByteImpl(array)
         }
         else {
@@ -302,17 +282,6 @@ data class Matrix(val line : Int, val col : Int, val values: ByteArray) {
 
     fun asVector() : VectorByte {
         return VectorByteImpl(this.values)
-        /*return object: VectorByte {
-            override val size: Int  = this@Matrix.line*this@Matrix.col
-
-            override fun get(index: Int): Byte {
-                return this@Matrix.values[index]
-            }
-
-            override fun forEachScalar(f: (Byte) -> Byte): Vector<Byte> {
-                TODO("Not yet implemented")
-            }
-        }*/
     }
 
 

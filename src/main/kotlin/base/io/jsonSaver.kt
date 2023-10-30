@@ -2,9 +2,7 @@ package base.io
 
 import base.neurons.*
 import base.vectors.Matrix
-import base.vectors.VectorByteImpl
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.builtins.ListSerializer
@@ -14,7 +12,6 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
-import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 val module = SerializersModule {

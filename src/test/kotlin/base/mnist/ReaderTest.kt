@@ -1,12 +1,7 @@
 package base.mnist
 
-import kotlinx.coroutines.*
 import org.junit.jupiter.api.Assertions
-
 import kotlin.test.Test
-
-import java.io.File
-import java.io.InputStream
 
 class ReaderTest {
 

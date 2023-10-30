@@ -9,7 +9,6 @@ import base.neurons.*
 import base.vectors.Matrix
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.StringFormat
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.nio.file.Files
@@ -24,7 +23,7 @@ fun main(args: Array<String>) {
     val mnists: Mnists = reader.readFile(resourceImages.path, resourceLabels.path)
 
     val format = Json {
-        prettyPrint = true
+        prettyPrint = false
         serializersModule = module
     }
     val brainFile: File = loadLastBrain()
@@ -50,18 +49,20 @@ fun main(args: Array<String>) {
     println("Score : ${score.first}")
 
     saveNewBrain(bestBrain, format)
+
+    val dataForTest = data.getData()
+    val testRate = trainer.test(bestBrain, dataForTest)
+    println("test : ${testRate}")
 }
 
 fun randomBrain(imageSize: Dimension): Brain {
     val layers = buildConvolutionLayers(imageSize, 10)
 
-    val layer0 = buildSimpleLayer(11 * 11 * 10, 2000)
+    val layer0 = buildSimpleLayer(12 * 12 * 10, 400)
 
-    val layer1 = buildSimpleLayer(2000, 150)
+    val layer1 = buildSimpleLayer(400, 100)
 
-    //val layer2 = buildSimpleLayer(150, 50)
-
-    val layer3 = buildSimpleLayer(150, 10)
+    val layer3 = buildSimpleLayer(100, 10)
 
     return Brain(
         layers = listOf(layers, layer0, layer1, /*layer2, */layer3)

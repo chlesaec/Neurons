@@ -7,7 +7,6 @@ import base.neurons.SimpleLayer
 import base.vectors.Matrix
 import base.vectors.RealVector
 import base.vectors.Vector
-import base.vectors.VectorByteImpl
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 

@@ -1,11 +1,11 @@
 package base
 
 import base.data.TrainingData
+import base.data.TrainingItem
 import base.neurons.Brain
 import base.vectors.Vector
 import kotlinx.coroutines.*
-import java.util.SortedMap
-import java.util.TreeMap
+import java.util.*
 
 data class EvaluatedBrain(
     val brain: Brain,
@@ -78,14 +78,24 @@ class Trainer<T>(val initBrain : Brain,
                 current = this.trainBrains(current, trainingData)
            // }
             val duration = System.currentTimeMillis() - startTime
-            /*if (current.best()?.rate ?: 0.0 > 0.99) {
+            if (current.best()?.rate ?: 0.0 > 0.9999) {
                 break
-            }*/
+            }
             trainingData =  data()
             println("---- $duration ----")
         }
 
         return current.best()!!.brain
+    }
+
+    fun test(brain: Brain, data: TrainingData<Byte>) : Double {
+        val total = data.items
+            .map {
+                item: TrainingItem<Byte> ->
+                item.scorePrevisionOK(brain::digest).second
+            }
+            .reduce(Double::plus)
+        return total / data.items.size.toDouble()
     }
 
     private fun getPredictor(number: Number?,
@@ -113,8 +123,8 @@ class Trainer<T>(val initBrain : Brain,
         var newBestBrains = Brains(10).mix(brains)
 
         repeat(4) {
-            val changeRate: Double =  3.0 / (it.toDouble() + 6.0 + (brains.best()?.rate ?: 0.0))
-            println("on tour ${it}, change rate : $changeRate; best rate: ${brains.best()?.rate ?: 0.0}")
+            val changeRate: Double =  3.0 / (it.toDouble() + 6.0 + (newBestBrains.best()?.rate ?: 0.0))
+            println("on tour ${it}, change rate : $changeRate; best rate: ${newBestBrains.best()?.rate ?: 0.0}")
 
             runBlocking {
                 val jobs = mutableListOf<Deferred<Brains>>()

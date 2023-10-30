@@ -53,17 +53,17 @@ internal class MatrixTest {
         Assertions.assertNotNull(result)
 
         Assertions.assertEquals(2, result.size)
-        Assertions.assertEquals(1 + 2*2 + 3*3, result.get(0));
-        Assertions.assertEquals(4 + 5*2 + 6*3, result.get(1));
+        Assertions.assertEquals(2, result.get(0));
+        Assertions.assertEquals(3, result.get(1));
 
         val vector2 = VectorByteImpl(2) {
                 index : Int -> (index + 1).toByte()
         }
         val result2 = matrix * vector2
         Assertions.assertEquals(3, result2.size)
-        Assertions.assertEquals(1 + 2*4, result2.get(0));
-        Assertions.assertEquals(2 + 5*2, result2.get(1));
-        Assertions.assertEquals(3 + 6*2, result2.get(2));
+        Assertions.assertEquals(2, result2.get(0));
+        Assertions.assertEquals(2, result2.get(1));
+        Assertions.assertEquals(2, result2.get(2));
     }
 
     @Test
@@ -79,20 +79,20 @@ internal class MatrixTest {
         val result = matrix * vector
         Assertions.assertNotNull(result)
         Assertions.assertEquals(2, result.size)
-        Assertions.assertEquals(1 + 2*2 + 3*3, result.get(0));
-        Assertions.assertEquals(4 + 2*5 + 3*6, result.get(1));
+        Assertions.assertEquals(2, result.get(0));
+        Assertions.assertEquals(3, result.get(1));
 
         val vectorMax = VectorByteImpl(3) { Byte.MAX_VALUE }
         val resultMax = matrix * vectorMax
         Assertions.assertEquals(2, resultMax.size)
-        Assertions.assertEquals(Byte.MAX_VALUE, resultMax.get(0))
-        Assertions.assertEquals(Byte.MAX_VALUE, resultMax.get(1))
+        Assertions.assertEquals(15, resultMax.get(0))
+        Assertions.assertEquals(25, resultMax.get(1))
 
         val vectorMin = VectorByteImpl(3) { Byte.MIN_VALUE }
         val resultMin = matrix * vectorMin
         Assertions.assertEquals(2, resultMin.size)
-        Assertions.assertEquals(resultMin.get(0), Byte.MIN_VALUE)
-        Assertions.assertEquals(resultMin.get(1), Byte.MIN_VALUE)
+        Assertions.assertEquals(-16, resultMin.get(0))
+        Assertions.assertEquals(-25, resultMin.get(1))
     }
 
     @Test
@@ -111,11 +111,11 @@ internal class MatrixTest {
         val result = matrix.timesMassMeans(listOf(vector, vector2))
         Assertions.assertNotNull(result)
         Assertions.assertEquals(2, result.size)
-        Assertions.assertEquals(1 + 2*2 + 3*3, result[0].get(0));
-        Assertions.assertEquals(4 + 2*5 + 3*6, result[0].get(1));
+        Assertions.assertEquals(2, result[0].get(0));
+        Assertions.assertEquals(3, result[0].get(1));
 
-        Assertions.assertEquals(1*2 + 2*3 + 3*4, result[1].get(0));
-        Assertions.assertEquals(4*2 + 5*3 + 6*4, result[1].get(1));
+        Assertions.assertEquals(2, result[1].get(0));
+        Assertions.assertEquals(3, result[1].get(1));
 
         val matrix2= Matrix(2, 3 ) {
             //  1, -2,  3
@@ -165,8 +165,6 @@ internal class MatrixTest {
                     repeat(random.nextInt(20)) {
                         sum += it
                     }
-
-                    println("Sum for $it is $sum; thread ${Thread.currentThread().id}")
                 }
                 jobs.add(job)
             }

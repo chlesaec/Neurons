@@ -1,7 +1,9 @@
 package base.neurons
 
-import base.vectors.*
-import java.lang.StringBuilder
+import base.vectors.Matrix
+import base.vectors.Vector
+import base.vectors.VectorByte
+import base.vectors.VectorByteImpl
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -73,6 +75,20 @@ open class SimpleLayer(val inputAxons : Matrix) : Layer {
     override fun toString(): String {
         return "Layer(inputAxons=" + System.lineSeparator() + "${inputAxons.toString()})"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SimpleLayer
+
+        return inputAxons == other.inputAxons
+    }
+
+    override fun hashCode(): Int {
+        return inputAxons.hashCode()
+    }
+
 }
 
 data class Dimension(val line: Int, val col: Int) {
@@ -131,7 +147,7 @@ class SubVectorByte(val totalVector: Vector<Byte>,
 class ConvolutionalLayer(inputAxons : Matrix, // axons
                          val inputDimension: Dimension) : SimpleLayer(inputAxons) {
 
-    private val resultDim = Dimension(inputDimension.line - inputAxons.line, inputDimension.col - inputAxons.col)
+    private val resultDim = Dimension(inputDimension.line + 1 - inputAxons.line, inputDimension.col + 1 - inputAxons.col)
 
     private val resultSize = resultDim.size()
 
@@ -190,6 +206,26 @@ class ConvolutionalLayer(inputAxons : Matrix, // axons
         return ConvolutionalLayer(simpleLayer.inputAxons,
             inputDimension)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        if (!super.equals(other)) return false
+
+        other as ConvolutionalLayer
+
+        if (inputDimension != other.inputDimension) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + axons.hashCode()
+        return result
+    }
+
+
 }
 
 class ConvolutionalLayers(val layers : List<ConvolutionalLayer>) : Layer {
@@ -207,10 +243,6 @@ class ConvolutionalLayers(val layers : List<ConvolutionalLayer>) : Layer {
         }
 
         return VectorByteImpl(res)
-/*
-        return VectorByteImpl(subResult.get(0).size) {
-            this.max(subResult, it)
-        }*/
     }
 
     override fun times(v: Vector<Byte>): Vector<Byte> {
@@ -261,6 +293,21 @@ class ConvolutionalLayers(val layers : List<ConvolutionalLayer>) : Layer {
     private fun max(vector: List<Vector<Byte>>, index: Int) : Byte {
         return vector.maxOf { it.get(index) }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ConvolutionalLayers
+
+        return layers == other.layers
+    }
+
+    override fun hashCode(): Int {
+        return layers.firstOrNull()?.hashCode() ?: 0
+    }
+
+
 }
 
 
@@ -301,4 +348,18 @@ class Brain(val layers : List<Layer>) {
                 s1: String, s2 : String -> s1 + System.lineSeparator() + s2
             }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Brain
+
+        return layers == other.layers
+    }
+
+    override fun hashCode(): Int {
+        return layers.firstOrNull()?.hashCode() ?: 0
+    }
+
 }

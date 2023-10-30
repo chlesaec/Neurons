@@ -1,10 +1,8 @@
 package base.data
 
-import base.EvaluatedBrain
 import base.vectors.RealVector
 import base.vectors.Vector
 import kotlin.math.exp
-import kotlin.math.sqrt
 
 fun softMax(values : RealVector): Pair<Double, DoubleArray> {
     val exponential = DoubleArray(values.size) {

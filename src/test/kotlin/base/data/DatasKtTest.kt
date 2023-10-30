@@ -1,7 +1,6 @@
 package base.data
 
 import base.vectors.Vector
-import base.vectors.VectorByte
 import base.vectors.VectorByteImpl
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
